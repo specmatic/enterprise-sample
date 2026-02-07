@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package com.example.proto.inventory;
+
+option java_multiple_files = true;
+option java_package = "com.example.proto.inventory";
+
+message InventoryItem {
+  string sku = 1;
+  int32 quantity = 2;
+}
+
+message ReserveRequest {
+  string orderId = 1;
+  repeated InventoryItem items = 2;
+}
+
+message ReserveReply {
+  bool accepted = 1;
+  string reason = 2;
+}
+
+service InventoryService {
+  rpc Reserve(ReserveRequest) returns (ReserveReply);
+}

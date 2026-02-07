@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package com.example.proto.orders;
+
+option java_multiple_files = true;
+option java_package = "com.example.proto.orders";
+
+message OrderItem {
+  string sku = 1;
+  int32 quantity = 2;
+}
+
+message PlaceOrderRequest {
+  string orderId = 1;
+  repeated OrderItem items = 2;
+}
+
+message PlaceOrderReply {
+  bool accepted = 1;
+  string reason = 2;
+}
+
+service OrderService {
+  rpc Place(PlaceOrderRequest) returns (PlaceOrderReply);
+}

@@ -1,0 +1,97 @@
+asyncapi: 3.0.0
+info:
+  title: Inventory Service AsyncAPI
+  version: 1.0.0
+servers:
+  local:
+    host: kafka:9092
+    protocol: kafka
+    description: Local Kafka broker
+channels:
+  inventory.reserve.cmd:
+    address: inventory.reserve.cmd
+    messages:
+      ReserveInventoryCommand:
+        $ref: '#/components/messages/ReserveInventoryCommand'
+  inventory.reserve.reply:
+    address: inventory.reserve.reply
+    messages:
+      ReserveInventoryResult:
+        $ref: '#/components/messages/ReserveInventoryResult'
+operations:
+  receiveReserveCommand:
+    action: receive
+    channel:
+      $ref: '#/channels/inventory.reserve.cmd'
+    messages:
+      - $ref: '#/channels/inventory.reserve.cmd/messages/ReserveInventoryCommand'
+    reply:
+      channel:
+        $ref: '#/channels/inventory.reserve.reply'
+      messages:
+        - $ref: '#/channels/inventory.reserve.reply/messages/ReserveInventoryResult'
+components:
+  messages:
+    ReserveInventoryCommand:
+      name: ReserveInventoryCommand
+      title: Reserve inventory command
+      headers:
+        type: object
+        required:
+          - correlationId
+        properties:
+          correlationId:
+            type: string
+      payload:
+        $ref: '#/components/schemas/ReserveInventoryCommand'
+      contentType: application/json
+    ReserveInventoryResult:
+      name: ReserveInventoryResult
+      title: Reserve inventory result
+      headers:
+        type: object
+        required:
+          - correlationId
+        properties:
+          correlationId:
+            type: string
+      payload:
+        $ref: '#/components/schemas/ReserveInventoryResult'
+      contentType: application/json
+  schemas:
+    OrderItem:
+      type: object
+      required:
+        - sku
+        - quantity
+      properties:
+        sku:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+          minimum: 1
+    ReserveInventoryCommand:
+      type: object
+      required:
+        - orderId
+        - items
+      properties:
+        orderId:
+          type: string
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    ReserveInventoryResult:
+      type: object
+      required:
+        - accepted
+      properties:
+        accepted:
+          type: boolean
+        reason:
+          type:
+            - string
+            - "null"

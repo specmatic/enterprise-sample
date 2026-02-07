@@ -1,0 +1,97 @@
+asyncapi: 3.0.0
+info:
+  title: PlaceOrder Service AsyncAPI
+  version: 1.0.0
+servers:
+  local:
+    host: kafka:9092
+    protocol: kafka
+    description: Local Kafka broker
+channels:
+  orders.place.cmd:
+    address: orders.place.cmd
+    messages:
+      PlaceOrderCommand:
+        $ref: '#/components/messages/PlaceOrderCommand'
+  orders.place.reply:
+    address: orders.place.reply
+    messages:
+      PlaceOrderResult:
+        $ref: '#/components/messages/PlaceOrderResult'
+operations:
+  receivePlaceOrderCommand:
+    action: receive
+    channel:
+      $ref: '#/channels/orders.place.cmd'
+    messages:
+      - $ref: '#/channels/orders.place.cmd/messages/PlaceOrderCommand'
+    reply:
+      channel:
+        $ref: '#/channels/orders.place.reply'
+      messages:
+        - $ref: '#/channels/orders.place.reply/messages/PlaceOrderResult'
+components:
+  messages:
+    PlaceOrderCommand:
+      name: PlaceOrderCommand
+      title: Place order command
+      headers:
+        type: object
+        required:
+          - correlationId
+        properties:
+          correlationId:
+            type: string
+      payload:
+        $ref: '#/components/schemas/PlaceOrderCommand'
+      contentType: application/json
+    PlaceOrderResult:
+      name: PlaceOrderResult
+      title: Place order result
+      headers:
+        type: object
+        required:
+          - correlationId
+        properties:
+          correlationId:
+            type: string
+      payload:
+        $ref: '#/components/schemas/PlaceOrderResult'
+      contentType: application/json
+  schemas:
+    OrderItem:
+      type: object
+      required:
+        - sku
+        - quantity
+      properties:
+        sku:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+          minimum: 1
+    PlaceOrderCommand:
+      type: object
+      required:
+        - orderId
+        - items
+      properties:
+        orderId:
+          type: string
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    PlaceOrderResult:
+      type: object
+      required:
+        - accepted
+      properties:
+        accepted:
+          type: boolean
+        reason:
+          type:
+            - string
+            - "null"
