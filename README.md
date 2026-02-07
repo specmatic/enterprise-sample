@@ -12,6 +12,7 @@ Pre-req: Make sure you have Docker and Docker Compose installed on your machine.
 ./gradlew :placeorder-service:bootJar
 ```
 
+#### 2. Run contract tests using Docker Compose
 ```shell
 docker compose -f docker-compose.test.yml up --build
 ```
