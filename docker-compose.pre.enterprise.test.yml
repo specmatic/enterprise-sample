@@ -4,7 +4,6 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: WARN
     ports:
       - "2181:2181"
     healthcheck:
@@ -26,16 +25,28 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LOG4J_ROOT_LOGLEVEL: ERROR
-      KAFKA_LOG4J_LOGGERS: "kafka=ERROR,kafka.log=ERROR,kafka.cluster=ERROR,kafka.server=ERROR,kafka.controller=ERROR,kafka.coordinator=ERROR,kafka.network=ERROR,state.change.logger=ERROR,org.apache.kafka=ERROR"
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/9092'"]
       interval: 5s
       timeout: 3s
       retries: 30
 
-  specmatic-mock:
-    image: specmatic/enterprise:latest
+  specmatic-stub:
+    image: specmatic/specmatic:latest
+    volumes:
+      - ./specmatic.yaml:/usr/src/app/specmatic.yaml
+      - ./specs:/usr/src/app/specs
+    command: ["stub"]
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/9000'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  specmatic-async-virtualize:
+    image: specmatic/specmatic-async:latest
     depends_on:
       kafka:
         condition: service_healthy
@@ -43,9 +54,16 @@ services:
       - ./specmatic.yaml:/usr/src/app/specmatic.yaml
       - ./specs:/usr/src/app/specs
       - ./common-proto/src/main/proto:/usr/src/app/common-proto/src/main/proto
-    command: ["mock"]
+    command: ["virtualize"]
+
+  specmatic-grpc-virtualize:
+    image: specmatic/specmatic-grpc:latest
+    volumes:
+      - ./specmatic.yaml:/usr/src/app/specmatic.yaml
+      - ./specs:/usr/src/app/specs
+      - ./common-proto/src/main/proto:/usr/src/app/common-proto/src/main/proto
+    command: ["virtualize", "--port=7001"]
     ports:
-      - "9000:9000"
       - "7001:7001"
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/7001'"]
@@ -58,15 +76,19 @@ services:
       context: .
       dockerfile: placeorder-service/Dockerfile
     depends_on:
-      specmatic-mock:
+      specmatic-stub:
+        condition: service_healthy
+      specmatic-async-virtualize:
+        condition: service_started
+      specmatic-grpc-virtualize:
         condition: service_healthy
     ports:
       - "8080:8080"
       - "9090:9090"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      INVENTORY_HTTP_BASE_URL: http://specmatic-mock:9000
-      GRPC_CLIENT_INVENTORY_ADDRESS: static://specmatic-mock:7001
+      INVENTORY_HTTP_BASE_URL: http://specmatic-stub:9000
+      GRPC_CLIENT_INVENTORY_ADDRESS: static://specmatic-grpc-virtualize:7001
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8080'"]
       interval: 5s
@@ -74,7 +96,18 @@ services:
       retries: 20
 
   specmatic-test:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:latest
+    depends_on:
+      placeorder-service:
+        condition: service_healthy
+    volumes:
+      - ./specmatic.yaml:/usr/src/app/specmatic.yaml
+      - ./specs:/usr/src/app/specs
+      - ./common-proto/src/main/proto:/usr/src/app/common-proto/src/main/proto
+    command: ["test", "--testBaseURL=http://placeorder-service:8080"]
+
+  specmatic-async-test:
+    image: specmatic/specmatic-async:latest
     depends_on:
       placeorder-service:
         condition: service_healthy
@@ -83,3 +116,14 @@ services:
       - ./specs:/usr/src/app/specs
       - ./common-proto/src/main/proto:/usr/src/app/common-proto/src/main/proto
     command: ["test"]
+
+  specmatic-grpc-test:
+    image: specmatic/specmatic-grpc:latest
+    depends_on:
+      placeorder-service:
+        condition: service_healthy
+    volumes:
+      - ./specmatic.yaml:/usr/src/app/specmatic.yaml
+      - ./specs:/usr/src/app/specs
+      - ./common-proto/src/main/proto:/usr/src/app/common-proto/src/main/proto
+    command: ["test", "--host=placeorder-service", "--port=9090"]
