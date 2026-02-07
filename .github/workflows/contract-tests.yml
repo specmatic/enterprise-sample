@@ -14,6 +14,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Build Application
+        run: |
+          set -euo pipefail
+          ./gradlew :inventory-service:bootJar
+          ./gradlew :placeorder-service:bootJar
+        shell: bash
+
       - name: Run Contract Tests
         run: |
           set -euo pipefail

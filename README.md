@@ -6,6 +6,12 @@ This is a sample project for Specmatic enterprise. It demonstrates how to use th
 
 Pre-req: Make sure you have Docker and Docker Compose installed on your machine.
 
+#### 1. Build the application
+```shell
+./gradlew :inventory-service:bootJar
+./gradlew :placeorder-service:bootJar
+```
+
 ```shell
 docker compose -f docker-compose.test.yml up --build
 ```
