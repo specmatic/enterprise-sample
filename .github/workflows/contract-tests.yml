@@ -9,6 +9,8 @@ on:
 jobs:
   contract-tests:
     runs-on: ubuntu-latest
+    env:
+      CTRF_REPORT_PATH: './build/reports/specmatic/**/ctrf/*.json'
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -31,3 +33,19 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml down -v --remove-orphans
         shell: bash
+
+      - name: Upload CTRF Reports
+        uses: actions/upload-artifact@v6
+        if: always() # Run even if tests fail
+        with:
+          name: ctrf-reports
+          path: ${{ env.CTRF_REPORT_PATH }}
+          if-no-files-found: warn
+          retention-days: 5
+
+      # Display CTRF test results
+      - name: Publish Test Results
+        uses: ctrf-io/github-test-reporter@v1
+        if: always() # Run even if tests fail
+        with:
+          report-path: ${{ env.CTRF_REPORT_PATH }}

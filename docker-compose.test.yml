@@ -82,4 +82,5 @@ services:
       - ./specmatic.yaml:/usr/src/app/specmatic.yaml
       - ./specs:/usr/src/app/specs
       - ./common-proto/src/main/proto:/usr/src/app/common-proto/src/main/proto
+      - ./build/reports/specmatic:/usr/src/app/build/reports/specmatic
     command: ["test"]
