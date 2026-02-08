@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package com.example.proto.payment;
+
+option java_multiple_files = true;
+option java_package = "com.example.proto.payment";
+
+message PaymentItem {
+  string sku = 1;
+  int32 quantity = 2;
+}
+
+message AuthorizeRequest {
+  string orderId = 1;
+  repeated PaymentItem items = 2;
+}
+
+message AuthorizeReply {
+  bool authorized = 1;
+  string reason = 2;
+}
+
+service PaymentService {
+  rpc Authorize(AuthorizeRequest) returns (AuthorizeReply);
+}

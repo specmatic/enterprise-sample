@@ -1,0 +1,101 @@
+asyncapi: 3.0.0
+info:
+  title: Payment Service AsyncAPI
+  version: 1.0.0
+servers:
+  local:
+    host: kafka:9092
+    protocol: kafka
+    description: Local Kafka broker
+channels:
+  payment.authorize.cmd:
+    address: payment.authorize.cmd
+    messages:
+      AuthorizePaymentCommand:
+        $ref: '#/components/messages/AuthorizePaymentCommand'
+  payment.authorize.reply:
+    address: payment.authorize.reply
+    messages:
+      AuthorizePaymentResult:
+        $ref: '#/components/messages/AuthorizePaymentResult'
+operations:
+  receiveAuthorizeCommand:
+    action: receive
+    channel:
+      $ref: '#/channels/payment.authorize.cmd'
+    messages:
+      - $ref: '#/channels/payment.authorize.cmd/messages/AuthorizePaymentCommand'
+    reply:
+      channel:
+        $ref: '#/channels/payment.authorize.reply'
+      messages:
+        - $ref: '#/channels/payment.authorize.reply/messages/AuthorizePaymentResult'
+components:
+  messages:
+    AuthorizePaymentCommand:
+      name: AuthorizePaymentCommand
+      title: Authorize payment command
+      headers:
+        type: object
+        required:
+          - correlationId
+        properties:
+          correlationId:
+            type: string
+      payload:
+        $ref: '#/components/schemas/AuthorizePaymentCommand'
+      contentType: application/json
+    AuthorizePaymentResult:
+      name: AuthorizePaymentResult
+      title: Authorize payment result
+      headers:
+        type: object
+        required:
+          - correlationId
+        properties:
+          correlationId:
+            type: string
+      payload:
+        $ref: '#/components/schemas/AuthorizePaymentResult'
+      examples:
+        - payload:
+            authorized: true
+      contentType: application/json
+  schemas:
+    OrderItem:
+      type: object
+      required:
+        - sku
+        - quantity
+      properties:
+        sku:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+          minimum: 1
+    AuthorizePaymentCommand:
+      type: object
+      required:
+        - orderId
+        - items
+      properties:
+        orderId:
+          type: string
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    AuthorizePaymentResult:
+      type: object
+      required:
+        - authorized
+      properties:
+        authorized:
+          type: boolean
+          default: true
+        reason:
+          type:
+            - string
+            - "null"

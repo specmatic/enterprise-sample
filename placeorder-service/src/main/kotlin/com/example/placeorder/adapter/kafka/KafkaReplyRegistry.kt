@@ -11,7 +11,10 @@ import java.util.concurrent.TimeUnit
 class KafkaReplyRegistry {
     private val pending = ConcurrentHashMap<String, CompletableFuture<String>>()
 
-    @KafkaListener(topics = ["inventory.reserve.reply", "orders.place.reply"], groupId = "orders-replies")
+    @KafkaListener(
+        topics = ["inventory.reserve.reply", "payment.authorize.reply", "orders.place.reply"],
+        groupId = "orders-replies"
+    )
     fun handle(record: ConsumerRecord<String, String>) {
         val correlationId = record.headers()
             .lastHeader("correlationId")

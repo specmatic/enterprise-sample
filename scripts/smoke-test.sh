@@ -24,7 +24,7 @@ if [ -z "${kafka_container_id}" ]; then
   exit 1
 fi
 
-echo "== HTTP test (PlaceOrder -> Inventory over HTTP) =="
+echo "== HTTP test (PlaceOrder -> Inventory + Payment over HTTP) =="
 http_raw=$(curl -s -X POST http://localhost:8080/orders \
   -H 'Content-Type: application/json' \
   -d '{"orderId":"o-1","items":[{"sku":"sku-1","quantity":2}]}')
@@ -43,7 +43,7 @@ fi
 echo "OK"
 
 if [ "${has_grpcurl}" = true ]; then
-  echo "== gRPC test (PlaceOrder -> Inventory over gRPC) =="
+  echo "== gRPC test (PlaceOrder -> Inventory + Payment over gRPC) =="
   grpc_raw=$(grpcurl -plaintext -d '{"orderId":"o-2","items":[{"sku":"sku-2","quantity":1}]}' \
     localhost:9090 com.example.proto.orders.OrderService/Place)
 

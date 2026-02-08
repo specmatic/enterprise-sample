@@ -8,6 +8,9 @@ grpc:
     inventory:
       address: static://localhost:9091
       negotiationType: plaintext
+    payment:
+      address: static://localhost:9093
+      negotiationType: plaintext
 
 spring:
   application:
@@ -26,6 +29,10 @@ spring:
 inventory:
   http:
     base-url: http://localhost:8081
+
+payment:
+  http:
+    base-url: http://localhost:8082
 
 management:
   endpoints:

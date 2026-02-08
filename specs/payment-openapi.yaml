@@ -1,0 +1,107 @@
+openapi: 3.0.3
+info:
+  title: Payment Service API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8082
+paths:
+  /payments/authorize:
+    post:
+      summary: Authorize payment for an order
+      operationId: authorizePayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizePaymentCommand'
+      responses:
+        '200':
+          description: Payment authorization result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizePaymentResult'
+              example:
+                authorized: true
+        '400':
+          description: Invalid request body or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpringBootError'
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpringBootError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpringBootError'
+components:
+  schemas:
+    OrderItem:
+      type: object
+      required:
+        - sku
+        - quantity
+      properties:
+        sku:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 200
+    AuthorizePaymentCommand:
+      type: object
+      required:
+        - orderId
+        - items
+      properties:
+        orderId:
+          type: string
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    AuthorizePaymentResult:
+      type: object
+      required:
+        - authorized
+      properties:
+        authorized:
+          type: boolean
+          default: true
+        reason:
+          type: string
+          nullable: true
+    SpringBootError:
+      type: object
+      description: Default Spring Boot error response (BasicErrorController)
+      required:
+        - timestamp
+        - status
+        - error
+        - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        trace:
+          type: string
+          description: Present only when server is configured to include stack traces

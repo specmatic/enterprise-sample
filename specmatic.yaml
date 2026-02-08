@@ -22,8 +22,10 @@ contracts:
           protocVersion: 3.23.4
     consumes:
       - specs/inventory-openapi.yaml
+      - specs/payment-openapi.yaml
       - specs:
           - specs/inventory-asyncapi.yaml
+          - specs/payment-asyncapi.yaml
         specType: asyncapi
         config:
           servers:
@@ -31,8 +33,11 @@ contracts:
               protocol: kafka
       - specs:
           - common-proto/src/main/proto/inventory.proto
+          - common-proto/src/main/proto/payment.proto
         specType: protobuf
         config:
           host: localhost
           port: 7001
           protocVersion: 3.23.4
+
+schemaExampleDefault: true

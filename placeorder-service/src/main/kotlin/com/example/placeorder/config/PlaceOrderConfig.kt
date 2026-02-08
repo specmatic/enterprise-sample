@@ -5,7 +5,11 @@ import com.example.placeorder.adapter.inventory.InventoryHttpClient
 import com.example.placeorder.adapter.inventory.InventoryKafkaClient
 import com.example.placeorder.adapter.kafka.KafkaReplyRegistry
 import com.example.placeorder.domain.InventoryPort
+import com.example.placeorder.domain.PaymentPort
 import com.example.placeorder.domain.PlaceOrder
+import com.example.placeorder.adapter.payment.PaymentGrpcClient
+import com.example.placeorder.adapter.payment.PaymentHttpClient
+import com.example.placeorder.adapter.payment.PaymentKafkaClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -18,14 +22,21 @@ import org.springframework.web.client.RestClient
 class PlaceOrderConfig {
 
     @Bean
-    fun inventoryRestClient(@Value($$"${inventory.http.base-url}") baseUrl: String): RestClient {
+    fun inventoryRestClient(@Value("\${inventory.http.base-url}") baseUrl: String): RestClient {
         return RestClient.builder()
             .baseUrl(baseUrl)
             .build()
     }
 
     @Bean
-    fun inventoryHttpPort(restClient: RestClient): InventoryPort = InventoryHttpClient(restClient)
+    fun paymentRestClient(@Value("\${payment.http.base-url}") baseUrl: String): RestClient {
+        return RestClient.builder()
+            .baseUrl(baseUrl)
+            .build()
+    }
+
+    @Bean
+    fun inventoryHttpPort(@Qualifier("inventoryRestClient") restClient: RestClient): InventoryPort = InventoryHttpClient(restClient)
 
     @Bean
     fun inventoryGrpcPort(grpcClient: InventoryGrpcClient): InventoryPort = grpcClient
@@ -38,14 +49,37 @@ class PlaceOrderConfig {
     ): InventoryPort = InventoryKafkaClient(kafkaTemplate, objectMapper, replyRegistry)
 
     @Bean
+    fun paymentHttpPort(@Qualifier("paymentRestClient") paymentRestClient: RestClient): PaymentPort =
+        PaymentHttpClient(paymentRestClient)
+
+    @Bean
+    fun paymentGrpcPort(grpcClient: PaymentGrpcClient): PaymentPort = grpcClient
+
+    @Bean
+    fun paymentKafkaPort(
+        kafkaTemplate: KafkaTemplate<String, String>,
+        objectMapper: ObjectMapper,
+        replyRegistry: KafkaReplyRegistry
+    ): PaymentPort = PaymentKafkaClient(kafkaTemplate, objectMapper, replyRegistry)
+
+    @Bean
     @Qualifier("placeOrderHttp")
-    fun placeOrderHttp(@Qualifier("inventoryHttpPort") inventoryPort: InventoryPort) = PlaceOrder(inventoryPort)
+    fun placeOrderHttp(
+        @Qualifier("inventoryHttpPort") inventoryPort: InventoryPort,
+        @Qualifier("paymentHttpPort") paymentPort: PaymentPort
+    ) = PlaceOrder(inventoryPort, paymentPort)
 
     @Bean
     @Qualifier("placeOrderGrpc")
-    fun placeOrderGrpc(@Qualifier("inventoryGrpcPort") inventoryPort: InventoryPort) = PlaceOrder(inventoryPort)
+    fun placeOrderGrpc(
+        @Qualifier("inventoryGrpcPort") inventoryPort: InventoryPort,
+        @Qualifier("paymentGrpcPort") paymentPort: PaymentPort
+    ) = PlaceOrder(inventoryPort, paymentPort)
 
     @Bean
     @Qualifier("placeOrderKafka")
-    fun placeOrderKafka(@Qualifier("inventoryKafkaPort") inventoryPort: InventoryPort) = PlaceOrder(inventoryPort)
+    fun placeOrderKafka(
+        @Qualifier("inventoryKafkaPort") inventoryPort: InventoryPort,
+        @Qualifier("paymentKafkaPort") paymentPort: PaymentPort
+    ) = PlaceOrder(inventoryPort, paymentPort)
 }

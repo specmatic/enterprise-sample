@@ -12,11 +12,14 @@ contracts:
       - common-proto/src/main/proto/orders.proto
     consumes:
       - specs/inventory-openapi.yaml
+      - specs/payment-openapi.yaml
       - specs:
           - specs/inventory-asyncapi.yaml
+          - specs/payment-asyncapi.yaml
         specType: asyncapi
         config:
           servers:
             - host: kafka:9092
               protocol: kafka
       - common-proto/src/main/proto/inventory.proto
+      - common-proto/src/main/proto/payment.proto

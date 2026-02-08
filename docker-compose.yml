@@ -45,6 +45,8 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       INVENTORY_HTTP_BASE_URL: http://inventory-service:8081
       GRPC_CLIENT_INVENTORY_ADDRESS: static://inventory-service:9091
+      PAYMENT_HTTP_BASE_URL: http://payment-service:8082
+      GRPC_CLIENT_PAYMENT_ADDRESS: static://payment-service:9093
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8080'"]
       interval: 5s

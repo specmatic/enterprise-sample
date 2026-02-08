@@ -29,3 +29,13 @@ data class ReserveInventoryResult(
     val accepted: Boolean,
     val reason: String? = null
 )
+
+data class AuthorizePaymentCommand(
+    val orderId: String,
+    val items: List<OrderItem>
+)
+
+data class AuthorizePaymentResult(
+    val authorized: Boolean,
+    val reason: String? = null
+)
