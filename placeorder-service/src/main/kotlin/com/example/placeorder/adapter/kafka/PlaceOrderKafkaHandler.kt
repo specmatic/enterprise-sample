@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class PlaceOrderKafkaHandler(
-    @Qualifier("placeOrderKafka") private val useCase: PlaceOrder,
+    @param:Qualifier("placeOrderKafka") private val useCase: PlaceOrder,
     private val kafkaTemplate: KafkaTemplate<String, String>,
     private val objectMapper: ObjectMapper
 ) {

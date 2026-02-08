@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 
 @GrpcService
 class PlaceOrderGrpcService(
-    @Qualifier("placeOrderGrpc") private val useCase: PlaceOrder
+    @param:Qualifier("placeOrderGrpc") private val useCase: PlaceOrder
 ) : OrderServiceGrpc.OrderServiceImplBase() {
 
     override fun place(request: PlaceOrderRequest, responseObserver: StreamObserver<PlaceOrderReply>) {

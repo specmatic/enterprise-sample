@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/orders")
 class PlaceOrderHttpController(
-    @Qualifier("placeOrderHttp") private val useCase: PlaceOrder
+    @param:Qualifier("placeOrderHttp") private val useCase: PlaceOrder
 ) {
     @PostMapping
     fun place(@RequestBody command: PlaceOrderCommand): PlaceOrderResult =

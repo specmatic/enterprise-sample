@@ -8,8 +8,7 @@ Pre-req: Make sure you have Docker and Docker Compose installed on your machine.
 
 #### 1. Build the application
 ```shell
-./gradlew :inventory-service:bootJar
-./gradlew :placeorder-service:bootJar
+./gradlew clean :placeorder-service:bootJar
 ```
 
 #### 2. Run contract tests using Docker Compose

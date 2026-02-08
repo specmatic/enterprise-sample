@@ -31,32 +31,12 @@ services:
       timeout: 3s
       retries: 30
 
-  inventory-service:
-    build:
-      context: .
-      dockerfile: inventory-service/Dockerfile
-    depends_on:
-      kafka:
-        condition: service_healthy
-    ports:
-      - "8081:8081"
-      - "9091:9091"
-    environment:
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8081'"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-
   placeorder-service:
     build:
       context: .
       dockerfile: placeorder-service/Dockerfile
     depends_on:
       kafka:
-        condition: service_healthy
-      inventory-service:
         condition: service_healthy
     ports:
       - "8080:8080"
