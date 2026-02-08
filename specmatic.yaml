@@ -17,7 +17,7 @@ contracts:
           - common-proto/src/main/proto/orders.proto
         specType: protobuf
         config:
-          host: localhost
+          host: placeorder-service
           port: 9090
           protocVersion: 3.23.4
     consumes:

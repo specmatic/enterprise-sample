@@ -7,6 +7,8 @@ services:
       ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: WARN
     ports:
       - "2181:2181"
+    networks:
+      - enterprise-network
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/2181'"]
       interval: 5s
@@ -20,6 +22,8 @@ services:
         condition: service_healthy
     ports:
       - "9092:9092"
+    networks:
+      - enterprise-network
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -47,6 +51,8 @@ services:
     ports:
       - "9000:9000"
       - "7001:7001"
+    networks:
+      - enterprise-network
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/7001'"]
       interval: 5s
@@ -63,12 +69,14 @@ services:
     ports:
       - "8080:8080"
       - "9090:9090"
+    networks:
+      - enterprise-network
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       INVENTORY_HTTP_BASE_URL: http://specmatic-mock:9000
       GRPC_CLIENT_INVENTORY_ADDRESS: static://specmatic-mock:7001
     healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/8080'"]
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/9090'"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -78,8 +86,14 @@ services:
     depends_on:
       placeorder-service:
         condition: service_healthy
+    networks:
+      - enterprise-network
     volumes:
       - ./specmatic.yaml:/usr/src/app/specmatic.yaml
       - ./specs:/usr/src/app/specs
       - ./common-proto/src/main/proto:/usr/src/app/common-proto/src/main/proto
     command: ["test"]
+
+networks:
+  enterprise-network:
+    driver: bridge
