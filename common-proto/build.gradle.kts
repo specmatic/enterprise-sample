@@ -8,7 +8,7 @@ plugins {
 val grpcVersion: String by rootProject.extra
 
 dependencies {
-    api("com.google.protobuf:protobuf-java:3.25.3")
+    api("com.google.protobuf:protobuf-java:3.25.5")
     api("io.grpc:grpc-protobuf:$grpcVersion")
     api("io.grpc:grpc-stub:$grpcVersion")
     api("javax.annotation:javax.annotation-api:1.3.2")
