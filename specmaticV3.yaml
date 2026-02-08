@@ -23,15 +23,9 @@ components:
             source:
               $ref: "#/components/sources/localFilesystem"
             specs:
-              - spec:
-                  id: placeOrderOpenApiSpec
-                  path: specs/placeorder-openapi.yaml
-              - spec:
-                  id: placeOrderAsyncApiSpec
-                  path: specs/placeorder-asyncapi.yaml
-              - spec:
-                  id: placeOrderGrpcSpec
-                  path: common-proto/src/main/proto/orders.proto
+              - specs/placeorder-openapi.yaml
+              - specs/placeorder-asyncapi.yaml
+              - common-proto/src/main/proto/orders.proto
     inventoryService:
       description: Inventory OpenAPI Service
       definitions:
