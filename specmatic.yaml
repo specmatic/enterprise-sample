@@ -19,7 +19,7 @@ contracts:
         config:
           host: localhost
           port: 9090
-        protocVersion: 3.23.4
+          protocVersion: 3.23.4
     consumes:
       - specs/inventory-openapi.yaml
       - specs:
@@ -35,4 +35,4 @@ contracts:
         config:
           host: localhost
           port: 7001
-        protocVersion: 3.23.4
+          protocVersion: 3.23.4
