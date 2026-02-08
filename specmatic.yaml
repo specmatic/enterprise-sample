@@ -1,43 +1,99 @@
-version: 2
-contracts:
-  - provides:
-      - specs:
-          - specs/placeorder-openapi.yaml
-        specType: openapi
-        config:
-          baseUrl: "http://placeorder-service:8080"
-      - specs:
-          - specs/placeorder-asyncapi.yaml
-        specType: asyncapi
-        config:
-          servers:
-            - host: kafka:9092
-              protocol: kafka
-      - specs:
-          - common-proto/src/main/proto/orders.proto
-        specType: protobuf
-        config:
-          host: placeorder-service
-          port: 9090
-          protocVersion: 3.23.4
-    consumes:
-      - specs/inventory-openapi.yaml
-      - specs/payment-openapi.yaml
-      - specs:
-          - specs/inventory-asyncapi.yaml
-          - specs/payment-asyncapi.yaml
-        specType: asyncapi
-        config:
-          servers:
-            - host: kafka:9092
-              protocol: kafka
-      - specs:
-          - common-proto/src/main/proto/inventory.proto
-          - common-proto/src/main/proto/payment.proto
-        specType: protobuf
-        config:
-          host: localhost
-          port: 7001
-          protocVersion: 3.23.4
+version: 3
+systemUnderTest:
+  service:
+    $ref: "#/components/services/placeOrderService"
+    runOptions:
+      $ref: "#/components/runOptions/placeOrderServiceTest"
+dependencies:
+  services:
+    - service:
+        $ref: "#/components/services/inventoryService"
+        runOptions:
+          $ref: "#/components/runOptions/inventoryServiceMock"
+    - service:
+        $ref: "#/components/services/paymentService"
+        runOptions:
+          $ref: "#/components/runOptions/paymentServiceMock"
+components:
+  sources:
+    localFilesystem:
+      filesystem:
+        directory: "."
+  services:
+    placeOrderService:
+      description: Place Order Service (OpenAPI, AsyncAPI, gRPC)
+      definitions:
+        - definition:
+            source:
+              $ref: "#/components/sources/localFilesystem"
+            specs:
+              - specs/placeorder-openapi.yaml
+              - specs/placeorder-asyncapi.yaml
+              - common-proto/src/main/proto/orders.proto
+    inventoryService:
+      description: Inventory OpenAPI Service
+      definitions:
+        - definition:
+            source:
+              $ref: "#/components/sources/localFilesystem"
+            specs:
+              - specs/inventory-openapi.yaml
+              - specs/inventory-asyncapi.yaml
+              - common-proto/src/main/proto/inventory.proto
+    paymentService:
+      description: Payment Service
+      definitions:
+        - definition:
+            source:
+              $ref: "#/components/sources/localFilesystem"
+            specs:
+              - specs/payment-openapi.yaml
+              - specs/payment-asyncapi.yaml
+              - common-proto/src/main/proto/payment.proto
+  runOptions:
+    placeOrderServiceTest:
+      openapi:
+        type: test
+        host: placeorder-service
+        port: 8080
+      asyncapi:
+        type: test
+        servers:
+          - host: "kafka:9092"
+            protocol: kafka
+      protobuf:
+        type: test
+        host: placeorder-service
+        port: 9090
+        protocVersion: 3.23.4
 
-schemaExampleDefault: true
+    inventoryServiceMock:
+      openapi:
+        type: mock
+        host: specmatic-mock
+        port: 9000
+      asyncapi:
+        type: mock
+        servers:
+          - host: "kafka:9092"
+            protocol: kafka
+      protobuf:
+        type: mock
+        host: localhost
+        port: 7001
+        protocVersion: 3.23.4
+    paymentServiceMock:
+      openapi:
+        type: mock
+        host: specmatic-mock
+        port: 9000
+      asyncapi:
+        type: mock
+        servers:
+          - host: "kafka:9092"
+            protocol: kafka
+      protobuf:
+        type: mock
+        host: localhost
+        port: 7001
+        protocVersion: 3.23.4
