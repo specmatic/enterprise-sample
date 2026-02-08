@@ -2,12 +2,12 @@ package com.example.placeorder.adapter.inventory
 
 import com.example.contract.ReserveInventoryCommand
 import com.example.contract.ReserveInventoryResult
-import com.example.placeorder.domain.InventoryPort
 import com.example.placeorder.adapter.kafka.KafkaReplyRegistry
+import com.example.placeorder.domain.InventoryPort
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.kafka.core.KafkaTemplate
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class InventoryKafkaClient(
@@ -18,7 +18,7 @@ class InventoryKafkaClient(
     override fun reserve(command: ReserveInventoryCommand): ReserveInventoryResult {
         val correlationId = UUID.randomUUID().toString()
         val payload = objectMapper.writeValueAsString(command)
-        val record = ProducerRecord<String, String>("inventory.reserve.cmd", command.orderId, payload)
+        val record = ProducerRecord("inventory.reserve.cmd", command.orderId, payload)
         record.headers().add("correlationId", correlationId.toByteArray())
         kafkaTemplate.send(record)
 

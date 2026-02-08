@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient
 class PlaceOrderConfig {
 
     @Bean
-    fun inventoryRestClient(@Value("\${inventory.http.base-url}") baseUrl: String): RestClient {
+    fun inventoryRestClient(@Value($$"${inventory.http.base-url}") baseUrl: String): RestClient {
         return RestClient.builder()
             .baseUrl(baseUrl)
             .build()
