@@ -1,0 +1,22 @@
+version: 2
+contracts:
+  - provides:
+      - specs/placeorder-openapi.yaml
+      - specs:
+          - specs/placeorder-asyncapi.yaml
+        specType: asyncapi
+        config:
+          servers:
+            - host: kafka:9092
+              protocol: kafka
+      - common-proto/src/main/proto/orders.proto
+    consumes:
+      - specs/inventory-openapi.yaml
+      - specs:
+          - specs/inventory-asyncapi.yaml
+        specType: asyncapi
+        config:
+          servers:
+            - host: kafka:9092
+              protocol: kafka
+      - common-proto/src/main/proto/inventory.proto
