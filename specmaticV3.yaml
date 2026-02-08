@@ -1,0 +1,76 @@
+version: 3
+systemUnderTest:
+  service:
+    $ref: "#/components/services/placeOrderService"
+    runOptions:
+      $ref: "#/components/runOptions/placeOrderServiceTest"
+dependencies:
+  services:
+    - service:
+        $ref: "#/components/services/inventoryService"
+        runOptions:
+          $ref: "#/components/runOptions/inventoryServiceMock"
+components:
+  sources:
+    localFilesystem:
+      filesystem:
+        directory: "."
+  services:
+    placeOrderService:
+      description: Place Order Service (OpenAPI, AsyncAPI, gRPC)
+      definitions:
+        - definition:
+            source:
+              $ref: "#/components/sources/localFilesystem"
+            specs:
+              - spec:
+                  id: placeOrderOpenApiSpec
+                  path: specs/placeorder-openapi.yaml
+              - spec:
+                  id: placeOrderAsyncApiSpec
+                  path: specs/placeorder-asyncapi.yaml
+              - spec:
+                  id: placeOrderGrpcSpec
+                  path: common-proto/src/main/proto/orders.proto
+    inventoryService:
+      description: Inventory OpenAPI Service
+      definitions:
+        - definition:
+            source:
+              $ref: "#/components/sources/localFilesystem"
+            specs:
+              - specs/inventory-openapi.yaml
+              - specs/inventory-asyncapi.yaml
+              - common-proto/src/main/proto/inventory.proto
+  runOptions:
+    placeOrderServiceTest:
+      openapi:
+        type: test
+        host: placeorder-service
+        port: 8080
+      asyncapi:
+        type: test
+        servers:
+          - host: "kafka:9092"
+            protocol: kafka
+      protobuf:
+        type: test
+        host: placeorder-service
+        port: 9090
+        protocVersion: 3.23.4
+
+    inventoryServiceMock:
+      openapi:
+        type: mock
+        host: specmatic-mock
+        port: 9000
+      asyncapi:
+        type: mock
+        servers:
+          - host: "kafka:9092"
+            protocol: kafka
+      protobuf:
+        type: mock
+        host: localhost
+        port: 7001
+        protocVersion: 3.23.4
