@@ -1,4 +1,4 @@
-rootProject.name = "order-system"
+rootProject.name = "enterprise-sample"
 
 pluginManagement {
     repositories {
@@ -16,6 +16,5 @@ dependencyResolutionManagement {
 include(
     ":common-proto",
     ":shared-contract",
-    ":inventory-service",
     ":placeorder-service"
 )
