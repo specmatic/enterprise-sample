@@ -12,7 +12,7 @@ plugins {
 group = "com.example"
 version = "0.1.0"
 
-val grpcVersion by extra("1.58.0")
+val grpcVersion by extra("1.79.0")
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
