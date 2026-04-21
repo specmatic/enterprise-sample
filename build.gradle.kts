@@ -6,7 +6,7 @@ plugins {
     kotlin("plugin.spring") version "2.3.20" apply false
     id("org.springframework.boot") version "3.5.13" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
-    id("com.google.protobuf") version "0.9.6" apply false
+    id("com.google.protobuf") version "0.10.0" apply false
 }
 
 group = "com.example"
