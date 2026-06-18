@@ -13,7 +13,7 @@ services:
       retries: 20
 
   kafka:
-    image: confluentinc/cp-kafka:7.9.7
+    image: confluentinc/cp-kafka:7.9.8
     depends_on:
       zookeeper:
         condition: service_healthy
