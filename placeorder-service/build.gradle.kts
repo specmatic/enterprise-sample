@@ -17,7 +17,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("net.devh:grpc-client-spring-boot-starter:2.15.0.RELEASE")
-    implementation("net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE")
+    implementation("net.devh:grpc-server-spring-boot-starter:3.1.0.RELEASE")
     runtimeOnly("io.grpc:grpc-netty-shaded:$grpcVersion")
     implementation("io.grpc:grpc-core:$grpcVersion")
 
